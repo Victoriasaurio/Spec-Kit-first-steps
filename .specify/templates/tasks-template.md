@@ -8,7 +8,7 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: NO TESTING ALLOWED - Constitution Principle V mandates zero automated tests (no unit, integration, or e2e tests). Manual verification is the sole quality gate.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -79,21 +79,18 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### ⚠️ NO TESTING SECTION FOR USER STORY 1
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
-
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+> **MANDATORY**: Per Constitution Principle V, NO automated tests of any kind (unit, integration, contract, e2e) are permitted. Manual verification by running the development server (npm run dev) and testing features manually is the required quality gate.
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T010 [P] [US1] Create React component in app/components/[ComponentName].tsx
+- [ ] T011 [P] [US1] Create utility functions in app/lib/[featureName].ts (if needed)
+- [ ] T012 [US1] Implement feature page in app/[feature]/page.tsx
+- [ ] T013 [US1] Add Tailwind CSS styling for responsive design
+- [ ] T014 [US1] Add form validation and error messages (plain language, user-friendly)
+- [ ] T015 [US1] Manual verification: run npm run dev and test all user story scenarios manually
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -105,17 +102,16 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### ⚠️ NO TESTING SECTION FOR USER STORY 2
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+> **MANDATORY**: Per Constitution Principle V, NO automated tests of any kind are permitted. Manual verification is required.
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T016 [P] [US2] Create React component in app/components/[ComponentName].tsx
+- [ ] T017 [US2] Implement feature page in app/[feature]/page.tsx
+- [ ] T018 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T019 [US2] Manual verification: test user story 2 with US1 in dev server
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -127,16 +123,15 @@ Examples of foundational tasks (adjust based on your project):
 
 **Independent Test**: [How to verify this story works on its own]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### ⚠️ NO TESTING SECTION FOR USER STORY 3
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+> **MANDATORY**: Per Constitution Principle V, NO automated tests of any kind are permitted. Manual verification is required.
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T020 [P] [US3] Create React component in app/components/[ComponentName].tsx
+- [ ] T021 [US3] Implement feature page in app/[feature]/page.tsx
+- [ ] T022 [US3] Manual verification: test user story 3 with all prior stories
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -151,10 +146,10 @@ Examples of foundational tasks (adjust based on your project):
 **Purpose**: Improvements that affect multiple user stories
 
 - [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
+- [ ] TXXX Code cleanup and refactoring for readability (Clean Code Principle)
+- [ ] TXXX Performance optimization and responsive design verification
+- [ ] TXXX Security hardening and input validation
+- [ ] TXXX Final manual verification: all features work on mobile, tablet, desktop
 - [ ] TXXX Run quickstart.md validation
 
 ---
@@ -216,16 +211,16 @@ Task: "Create [Entity2] model in src/models/[entity2].py"
 1. Complete Phase 1: Setup
 2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
 3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
+4. **STOP and VALIDATE**: Manually test User Story 1 (run npm run dev, verify all scenarios work)
 5. Deploy/demo if ready
 
 ### Incremental Delivery
 
 1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
+2. Add User Story 1 → Manually test in dev server → Deploy/Demo (MVP!)
+3. Add User Story 2 → Manually test all stories → Deploy/Demo
+4. Add User Story 3 → Manually test all stories → Deploy/Demo
+5. Each story adds value without breaking previous stories (verified by manual testing)
 
 ### Parallel Team Strategy
 

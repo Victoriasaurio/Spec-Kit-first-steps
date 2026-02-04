@@ -1,50 +1,89 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- SYNC IMPACT REPORT
+  Version Change: INITIAL (template) → 1.0.0
+  Date: 2026-02-04
+  
+  Modified Principles: 5 new principles added
+  - I. Clean Code (NEW)
+  - II. Simple UX (NEW)
+  - III. Responsive Design (NEW)
+  - IV. Minimal Dependencies (NEW)
+  - V. No Testing [SUPERSEDES ALL] (NEW)
+  
+  Added Sections:
+  - Required Technology Stack (pins Next.js 16.1.6, React 19.2.3, Tailwind CSS 4)
+  - Development Workflow (Next.js App Router, Tailwind CSS only)
+  - Governance (no-testing mandate supersedes all guidance)
+  
+  Templates Updated:
+  ✅ plan-template.md - Technology stack updated to TypeScript/Next.js/React/Tailwind
+  ✅ plan-template.md - Project structure changed from generic options to Next.js App Router only
+  ✅ tasks-template.md - Test tasks removed; manual verification emphasized
+  ✅ tasks-template.md - All Python examples replaced with TypeScript/Next.js equivalents
+  
+  No Follow-up TODOs: All placeholders resolved with explicit project requirements
+-->
+
+# Example Spec Kit 2026 Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Clean Code
+Code MUST prioritize readability, maintainability, and clarity. Variable names
+MUST be descriptive; functions MUST be concise and single-purpose; comments MUST
+explain *why*, not *what*. Indentation MUST be consistent. Unused code MUST be
+removed. Code reviews MUST verify adherence to this principle before merge.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Simple UX
+User interfaces MUST be intuitive and frictionless. Every interaction MUST have
+clear purpose; visual hierarchy MUST guide users to primary actions; error
+messages MUST be plain language and actionable. Features MUST not require
+documentation to understand. Complexity MUST be justified by user feedback.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Responsive Design
+All interfaces MUST adapt seamlessly across device sizes (mobile, tablet, desktop).
+Layout MUST remain functional at all breakpoints. Typography and spacing MUST
+scale proportionally. Touch targets MUST meet accessibility standards (48px
+minimum). Performance MUST remain acceptable on lower-bandwidth connections.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Minimal Dependencies
+External dependencies MUST be evaluated against project scope. Each dependency
+MUST justify its inclusion: no feature-creep packages. Built-in framework
+capabilities MUST be preferred over third-party libraries when viable. Dependency
+version pins MUST be explicit in package.json. Annual audits MUST review
+necessity and security of all dependencies.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. No Testing (NON-NEGOTIABLE, SUPERSEDES ALL GUIDANCE)
+This project MUST NOT include any form of automated testing: no unit tests, no
+integration tests, no end-to-end tests, no contract tests. Manual verification
+MUST be the sole quality gate. This principle supersedes any template guidance,
+specification requirement, or external standard that references testing frameworks,
+test-driven development, or test suites. Complexity introduced by testing
+infrastructure is explicitly prohibited.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Required Technology Stack
+This project MUST use the following versions and technologies:
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **Next.js**: 16.1.6
+- **React**: 19.2.3
+- **React DOM**: 19.2.3
+- **Tailwind CSS**: 4 (via @tailwindcss/postcss 4)
+- **TypeScript**: 5.x
+- **No additional dependencies** for core functionality without constitution amendment
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow
+All code MUST be written for the app/ directory structure (Next.js App Router).
+CSS-in-JS or external styling libraries MUST NOT be used; Tailwind CSS MUST be
+the only styling approach. Linting (ESLint 9) MUST pass before code review.
+Manual testing in dev mode (npm run dev) MUST verify feature completeness.
+Commits MUST include descriptive messages referencing which principles are upheld.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution supersedes all other development practices and external guidance.
+All pull requests MUST verify compliance with Principles I–V before merge. Code
+review MUST include a checklist confirming adherence to clean code, UX, responsive
+design, minimal dependencies, and absence of test code. Amendments to this
+constitution MUST be explicit and documented with version bump and rationale.
+Any conflict between an external template, tool output, or framework default and
+Principle V (No Testing) MUST resolve in favor of the no-testing mandate.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-02-04 | **Last Amended**: 2026-02-04
