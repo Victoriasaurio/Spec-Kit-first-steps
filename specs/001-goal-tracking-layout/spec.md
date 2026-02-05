@@ -5,6 +5,17 @@
 **Status**: Draft  
 **Input**: User description: "initial page setup - goal tracking web app called 'doit' with two-column layout..."
 
+## Clarifications
+
+### Session 2026-02-04
+
+- Q: Date boundary behavior—what happens when a goal's end date equals today? → A: Goals with end_date=today show "0 days left" and remain in active column. Users can check them off. Only after 11:59 PM (end of day) does the goal expire.
+- Q: Sorting & display order for completed goals—should users be able to reorder, or is a fixed sort required? → A: Fixed reverse chronological by completion_date (newest first). No user sorting/filtering in MVP.
+- Q: Undo/restore duration & scope—how long should restore work? → A: Persistent restore button on each completed goal (↻ icon or "Restore" button). Works anytime, even after page refresh. Stored in localStorage.
+- Q: Visual warning threshold—fixed or configurable? → A: Fixed 3-day threshold for MVP. Two visual levels: warning (3-1 days, pastel yellow), critical (0 or fewer days, pastel red).
+
+---
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - View Active Goals with Countdown (Priority: P1)
@@ -38,8 +49,9 @@ As a goal tracker, I want to check a goal and move it to a completed column so I
 1. **Given** a user has an active goal in the left column, **When** they click the checkbox next to the goal, **Then** the goal is marked as complete
 2. **Given** a goal is marked complete, **When** the action completes, **Then** the goal moves to the right "Completed Goals" column
 3. **Given** a goal is in the Completed column, **When** the user views the page, **Then** the completed goal remains visible in the right column
-4. **Given** a goal is in the Completed column, **When** the user wants to undo, **Then** an undo action (or re-activation button) allows moving it back to active
-5. **Given** multiple goals are completed, **When** the user views the page, **Then** all completed goals display in the right column in reverse chronological order (newest first)
+4. **Given** a goal is in the Completed column, **When** the user clicks the "Restore" or ↻ button, **Then** the goal moves back to the Active column with recalculated days remaining
+5. **Given** a goal is restored from Completed column, **When** the page is refreshed, **Then** the goal remains in Active column (restore persists)
+6. **Given** multiple goals are completed, **When** the user views the page, **Then** all completed goals display in the right column in reverse chronological order (newest first)
 
 ---
 
@@ -74,8 +86,9 @@ As a user, I want to click a button to open a modal form where I can enter a goa
 2. **Given** the modal is open, **When** the user enters a title and selects an end date and clicks "Create", **Then** the modal closes
 3. **Given** the modal closes after creating a goal, **When** the page updates, **Then** the new goal appears in the left "Active Goals" column
 4. **Given** the user attempts to submit the form with an empty title, **When** they click "Create", **Then** an error message appears: "Goal title is required"
-5. **Given** the user attempts to submit with a date in the past, **When** they click "Create", **Then** an error message appears: "End date must be in the future"
-6. **Given** the modal is open, **When** the user clicks outside the modal or clicks "Cancel", **Then** the modal closes without creating a goal
+5. **Given** the user attempts to submit with a date in the past, **When** they click "Create", **Then** an error message appears: "End date must be in the future or today"
+6. **Given** the user attempts to submit with today's date, **When** they click "Create", **Then** the form accepts it and creates the goal with "0 days left" status
+7. **Given** the modal is open, **When** the user clicks outside the modal or clicks "Cancel", **Then** the modal closes without creating a goal
 
 ---
 
@@ -91,21 +104,24 @@ As a user, I want to click a button to open a modal form where I can enter a goa
 ### Functional Requirements
 
 - **FR-001**: System MUST display active goals in a left column with title and days remaining formatted as "Goal Title — X days left"
-- **FR-002**: System MUST display completed goals in a right column with their titles
+- **FR-002**: System MUST display completed goals in a right column with their titles, sorted by completion_date in descending order (newest first)
 - **FR-003**: System MUST calculate days remaining as: ceiling(end_date - today)
-- **FR-004**: System MUST highlight goals with 3 days or fewer remaining with a visual warning style (pastel color)
-- **FR-005**: System MUST highlight goals with 0 or fewer days remaining (overdue) with a stronger warning style
+- **FR-004**: System MUST highlight goals with 3 days or fewer remaining with a "warning" visual style (pastel yellow background or border)
+- **FR-005**: System MUST highlight goals with 0 or fewer days remaining (overdue/expired) with a "critical" visual style (pastel red background or border), visually distinct from warning style
 - **FR-006**: System MUST not display expired goals (end_date < today) in the active column unless explicitly restored
 - **FR-007**: System MUST provide a checkbox next to each active goal that marks it complete and moves it to the completed column
 - **FR-008**: System MUST provide a delete button/icon for each goal (active or completed) with confirmation dialog
 - **FR-009**: System MUST render a "Add Goal" button (or "+ New Goal") that opens a modal dialog
 - **FR-010**: System MUST validate goal title is not empty before accepting form submission
-- **FR-011**: System MUST validate end date is in the future (not today, not past) before accepting form submission
+- **FR-011**: System MUST validate end date is in the future (end_date ≥ today) before accepting form submission; today is a valid end date
+- **FR-011a**: System MUST treat goals with end_date=today as "0 days left" (completable during that day); they only expire and leave active column after 11:59 PM (end of calendar day)
 - **FR-012**: System MUST render the modal with input fields: Goal Title (text input) and End Date (date picker)
 - **FR-013**: System MUST display a helpful empty state in the left column when no active goals exist (e.g., "No active goals! Time to add one 🎉")
 - **FR-014**: System MUST display empty state in the right column when no completed goals exist (e.g., "No completed goals yet. Keep working! 💪")
 - **FR-015**: System MUST persist all goal state (active/completed/deleted) to browser storage (localStorage) so data survives page refresh
-- **FR-016**: System MUST support undo/restore functionality to move completed goals back to active (button or drag-and-drop indicator)
+- **FR-016**: System MUST provide a persistent "Restore" button (or ↻ icon) next to each completed goal; clicking restores the goal to active column and recalculates days remaining
+- **FR-016a**: Restore functionality MUST persist across page refreshes (stored in localStorage); users can restore completed goals anytime, indefinitely
+- **FR-016b**: When a goal is restored from completed to active, it MUST recalculate days remaining based on its original end_date
 
 ### Key Entities
 
