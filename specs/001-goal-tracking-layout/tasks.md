@@ -19,35 +19,35 @@ This document provides the complete implementation task checklist for the DoIt G
 
 ### Setup Tasks (Non-Parallelizable - Prerequisites)
 
-- [ ] T001 Initialize Next.js project structure and verify dependencies in `package.json`
+- [x] T001 Initialize Next.js project structure and verify dependencies in `package.json`
   - Verify: Next.js 16.1.6, React 19.2.3, TypeScript 5.x, Tailwind CSS 4, date-fns, nanoid, clsx, tailwind-merge
   - Ensure no test runners installed (no Jest, Vitest, Cypress, etc.)
 
-- [ ] T002 Initialize shadcn/ui components with `npx shadcn-ui@latest init`
+- [x] T002 Initialize shadcn/ui components with `npx shadcn-ui@latest init`
   - Add Dialog, Button, Input components via CLI
   - Verify components available in `components/ui/`
 
-- [ ] T003 Configure Tailwind CSS `@theme` directive in `app/styles/globals.css`
+- [x] T003 Configure Tailwind CSS `@theme` directive in `app/styles/globals.css`
   - Define `--colors-warning: #fef3c7` (pastel yellow for 3-1 days)
   - Define `--colors-critical: #fecaca` (pastel red for ≤0 days)
   - Include standard Tailwind directives: `@tailwind base`, `@tailwind components`, `@tailwind utilities`
 
-- [ ] T004 Create TypeScript configuration and types in `app/lib/types.ts`
+- [x] T004 Create TypeScript configuration and types in `app/lib/types.ts`
   - Export Goal interface: `{ id: string; title: string; endDate: Date; createdAt: Date }`
   - Export GoalStatus type: `"active" | "warning" | "critical"`
 
-- [ ] T005 Create utility function `cn()` in `app/utils/cn.ts`
+- [x] T005 Create utility function `cn()` in `app/utils/cn.ts`
   - Use clsx + tailwind-merge pattern for safe class composition
   - Export default: `export function cn(...inputs: ClassValue[]): string`
 
-- [ ] T006 Create `app/lib/goalStorage.ts` module for localStorage operations
+- [x] T006 Create `app/lib/goalStorage.ts` module for localStorage operations
   - Export `loadActiveGoals(): Goal[]` — reads `doit_goals` key with fallback `[]`
   - Export `saveActiveGoals(goals: Goal[]): void` — writes to `doit_goals` key, handles QuotaExceededError
   - Export `loadCompletedGoals(): Goal[]` — reads `doit_completed` key with fallback `[]`
   - Export `saveCompletedGoals(goals: Goal[]): void` — writes to `doit_completed` key
   - Include error logging for parse failures
 
-- [ ] T007 Create `app/lib/goalUtils.ts` module for business logic
+- [x] T007 Create `app/lib/goalUtils.ts` module for business logic
   - Export `daysRemaining(endDate: Date): number` — returns `differenceInDays(startOfDay(endDate), startOfDay(today))`
   - Export `isExpired(endDate: Date): boolean` — returns `daysRemaining(endDate) < 0`
   - Export `isToday(endDate: Date): boolean` — returns `daysRemaining(endDate) === 0`
@@ -56,12 +56,12 @@ This document provides the complete implementation task checklist for the DoIt G
   - Export `sortCompletedGoals(goals: Goal[]): Goal[]` — sort by `completedAt` (descending, newest first)
   - Export `validateGoal(title: string, endDate: Date): string | null` — validate title non-empty and endDate ≥ today
 
-- [ ] T008 Create `app/lib/dateFormatting.ts` module for date-fns wrappers
+- [x] T008 Create `app/lib/dateFormatting.ts` module for date-fns wrappers
   - Export `formatDate(date: Date): string` — returns date in "MMM dd, yyyy" format (e.g., "Feb 05, 2026")
   - Export `formatCompletedDate(date: Date): string` — same as above
   - Export `daysRemainingDisplay(days: number): string` — returns "$days days left" (handle singular "1 day left")
 
-- [ ] T009 Update `app/layout.tsx` root layout with global styles
+- [x] T009 Update `app/layout.tsx` root layout with global styles
   - Import Tailwind directives from `app/styles/globals.css`
   - Add metadata: `{ title: "DoIt Goal Tracking", description: "Track and celebrate your goals" }`
   - Ensure responsive meta viewport tag present
@@ -73,26 +73,26 @@ This document provides the complete implementation task checklist for the DoIt G
 
 ### Core Component Infrastructure (Parallelizable - [P])
 
-- [ ] T010 [P] Create `app/components/EmptyState.tsx` component
+- [x] T010 [P] Create `app/components/EmptyState.tsx` component
   - Props: `{ type: "active" | "completed" }`
   - Render: Centered text message with contextual copy
   - Active: "No active goals. Click 'Add Goal' to get started!"
   - Completed: "No completed goals yet. Complete your first goal to celebrate your progress!"
   - Styling: `text-center py-12 text-gray-500`
 
-- [ ] T011 [P] Create `app/components/AddGoalButton.tsx` component
+- [x] T011 [P] Create `app/components/AddGoalButton.tsx` component
   - Props: `{ onClick: () => void }`
   - Render: Blue button with "+ Add Goal" text
   - Styling: `bg-blue-600 hover:bg-blue-700 text-white rounded-lg h-10 px-4 font-semibold`
   - Accessibility: Focus-visible outline, 48px min touch target
 
-- [ ] T012 [P] Create `app/components/GoalCountdown.tsx` component
+- [x] T012 [P] Create `app/components/GoalCountdown.tsx` component
   - Props: `{ days: number; status: GoalStatus }`
   - Render: Badge showing "$days days left" (or "0 days left" for today)
   - Styling: Apply status color — default text-gray-600, warning text-yellow-700, critical text-red-700
   - Logic: Use `daysRemainingDisplay()` helper to format singular/plural
 
-- [ ] T013 [P] Create `app/components/ActiveGoalCard.tsx` component
+- [x] T013 [P] Create `app/components/ActiveGoalCard.tsx` component
   - Props: `{ goal: Goal; onCheck: (id: string) => void; onDelete: (id: string) => void }`
   - Render: Flexbox card with:
     - Left: Checkbox (h-5 w-5) + goal title (font-semibold) + GoalCountdown component
@@ -101,7 +101,7 @@ This document provides the complete implementation task checklist for the DoIt G
   - Interactions: Checkbox triggers onCheck(goal.id), delete button triggers onDelete(goal.id)
   - Accessibility: Label associated with checkbox
 
-- [ ] T014 [P] Create `app/components/CompletedGoalCard.tsx` component
+- [x] T014 [P] Create `app/components/CompletedGoalCard.tsx` component
   - Props: `{ goal: Goal & { completedAt: Date }; onRestore: (id: string) => void; onDelete: (id: string) => void }`
   - Render: Flexbox card with:
     - Left: Goal title (line-through, text-gray-700) + "Completed: $date" subtitle
@@ -109,20 +109,20 @@ This document provides the complete implementation task checklist for the DoIt G
   - Styling: `bg-gray-100 opacity-75 rounded-lg border`
   - Interactions: Restore button calls onRestore(goal.id), delete button calls onDelete(goal.id)
 
-- [ ] T015 [P] Create `app/components/GoalsList.tsx` component
+- [x] T015 [P] Create `app/components/GoalsList.tsx` component
   - Props: `{ goals: Goal[]; isCompleted?: boolean; onCheck?: (id: string) => void; onRestore?: (id: string) => void; onDelete: (id: string) => void }`
   - Render: Scrollable div with space-y-3 gap
   - Logic: Map goals array, render ActiveGoalCard or CompletedGoalCard based on `isCompleted` flag
   - Styling: `max-h-[600px] overflow-y-auto space-y-3`
 
-- [ ] T016 [P] Create `app/components/ActiveGoalsColumn.tsx` component
+- [x] T016 [P] Create `app/components/ActiveGoalsColumn.tsx` component
   - Props: `{ goals: Goal[]; onCheck: (id: string) => void; onDelete: (id: string) => void; onAddClick: () => void }`
   - Render: Column div with:
     - Header: "Active Goals" title + AddGoalButton
     - Body: If goals.length === 0 render EmptyState type="active", else GoalsList
   - Styling: `bg-white rounded-lg shadow p-6`
 
-- [ ] T017 [P] Create `app/components/CompletedGoalsColumn.tsx` component
+- [x] T017 [P] Create `app/components/CompletedGoalsColumn.tsx` component
   - Props: `{ goals: Goal[]; onRestore: (id: string) => void; onDelete: (id: string) => void }`
   - Render: Column div with:
     - Header: "Completed Goals" title
@@ -135,7 +135,7 @@ This document provides the complete implementation task checklist for the DoIt G
 
 ### Add Goal Form (Non-Parallelizable - Modal Requires Validation)
 
-- [ ] T018 Create `app/components/AddGoalModal.tsx` component
+- [x] T018 Create `app/components/AddGoalModal.tsx` component
   - Props: `{ open: boolean; onOpenChange: (open: boolean) => void; onSubmit: (title: string, endDate: Date) => void }`
   - State: `{ title: string; endDate: Date | null; error: string | null }`
   - Render (using shadcn Dialog):
@@ -172,23 +172,23 @@ This document provides the complete implementation task checklist for the DoIt G
 
 **Implementation Tasks**:
 
-- [ ] T019 [US1] Implement goal loading from localStorage in `app/page.tsx`
+- [x] T019 [US1] Implement goal loading from localStorage in `app/page.tsx`
   - useEffect hook: on mount, call `loadActiveGoals()` and `loadCompletedGoals()`
   - setGoals() and setCompletedGoals() with loaded data
   - Handle parse errors gracefully (show empty state)
 
-- [ ] T020 [US1] Create initial state and rendering in `app/page.tsx` home page
+- [x] T020 [US1] Create initial state and rendering in `app/page.tsx` home page
   - State: `const [goals, setGoals] = useState<Goal[]>([])`
   - State: `const [completedGoals, setCompletedGoals] = useState<Goal[]>([])`
   - Render: Two-column grid (grid-cols-1 md:grid-cols-2) with ActiveGoalsColumn + CompletedGoalsColumn
   - Pass sorted active goals to ActiveGoalsColumn: `sortActiveGoals(goals)`
 
-- [ ] T021 [P] [US1] Filter expired goals from display in `app/components/ActiveGoalsColumn.tsx`
+- [x] T021 [P] [US1] Filter expired goals from display in `app/components/ActiveGoalsColumn.tsx`
   - Receive goals prop
   - Filter: only display goals where `daysRemaining(goal.endDate) >= 0`
   - Pass filtered list to GoalsList component
 
-- [ ] T022 [P] [US1] Apply visual warning/critical states in `app/components/ActiveGoalCard.tsx`
+- [x] T022 [P] [US1] Apply visual warning/critical states in `app/components/ActiveGoalCard.tsx`
   - Compute `status = getVisualStatus(goal.endDate)` from goalUtils
   - Apply conditional styling:
     - `status === "warning"`: `bg-warning border-l-4` (yellow background)
@@ -196,7 +196,7 @@ This document provides the complete implementation task checklist for the DoIt G
     - default: `bg-white border-l-4 border-gray-300`
   - Use `cn()` utility for safe class merging
 
-- [ ] T023 [US1] Render empty state when no active goals in `app/components/ActiveGoalsColumn.tsx`
+- [x] T023 [US1] Render empty state when no active goals in `app/components/ActiveGoalsColumn.tsx`
   - Condition: if `goals.filter(g => daysRemaining(g.endDate) >= 0).length === 0`
   - Render: `<EmptyState type="active" />`
 
@@ -219,7 +219,7 @@ This document provides the complete implementation task checklist for the DoIt G
 
 **Implementation Tasks**:
 
-- [ ] T024 [US2] Implement checkbox completion handler in `app/page.tsx`
+- [x] T024 [US2] Implement checkbox completion handler in `app/page.tsx`
   - Function: `handleCheckGoal(id: string): void`
   - Logic:
     - Find goal in goals array by id
@@ -228,7 +228,7 @@ This document provides the complete implementation task checklist for the DoIt G
     - Remove from goals array
     - Call setGoals() and setCompletedGoals() (triggers localStorage sync)
 
-- [ ] T025 [US2] Implement restore handler in `app/page.tsx`
+- [x] T025 [US2] Implement restore handler in `app/page.tsx`
   - Function: `handleRestoreGoal(id: string): void`
   - Logic:
     - Find goal in completedGoals by id
@@ -237,22 +237,22 @@ This document provides the complete implementation task checklist for the DoIt G
     - Remove from completedGoals array
     - Call setGoals() and setCompletedGoals()
 
-- [ ] T026 [US2] Add localStorage sync useEffect in `app/page.tsx`
+- [x] T026 [US2] Add localStorage sync useEffect in `app/page.tsx`
   - Effect on [goals] dependency: `saveActiveGoals(goals)` after render
   - Effect on [completedGoals] dependency: `saveCompletedGoals(completedGoals)` after render
   - Ensures all state changes persist to localStorage
 
-- [ ] T027 [P] [US2] Implement checkbox handler in `app/components/ActiveGoalCard.tsx`
+- [x] T027 [P] [US2] Implement checkbox handler in `app/components/ActiveGoalCard.tsx`
   - Checkbox onChange: call `onCheck(goal.id)`
 
-- [ ] T028 [P] [US2] Implement restore handler in `app/components/CompletedGoalCard.tsx`
+- [x] T028 [P] [US2] Implement restore handler in `app/components/CompletedGoalCard.tsx`
   - Restore button onClick: call `onRestore(goal.id)`
 
-- [ ] T029 [US2] Sort completed goals by date in `app/components/CompletedGoalsColumn.tsx`
+- [x] T029 [US2] Sort completed goals by date in `app/components/CompletedGoalsColumn.tsx`
   - Pass sorted goals to GoalsList: `sortCompletedGoals(completedGoals)`
   - Ensure newest-first order (reverse chronological)
 
-- [ ] T030 [US2] Render empty state when no completed goals in `app/components/CompletedGoalsColumn.tsx`
+- [x] T030 [US2] Render empty state when no completed goals in `app/components/CompletedGoalsColumn.tsx`
   - Condition: if `completedGoals.length === 0`
   - Render: `<EmptyState type="completed" />`
 
@@ -275,7 +275,7 @@ This document provides the complete implementation task checklist for the DoIt G
 
 **Implementation Tasks**:
 
-- [ ] T031 [US3] Implement delete handler in `app/page.tsx`
+- [x] T031 [US3] Implement delete handler in `app/page.tsx`
   - Function: `handleDeleteGoal(id: string, isCompleted: boolean): void`
   - Logic:
     - If isCompleted: remove from completedGoals
@@ -283,18 +283,18 @@ This document provides the complete implementation task checklist for the DoIt G
     - Call appropriate setState() (triggers localStorage sync)
     - Note: Confirmation dialog handled in component, this is post-confirm handler
 
-- [ ] T032 [US3] Add delete button to `app/components/ActiveGoalCard.tsx`
+- [x] T032 [US3] Add delete button to `app/components/ActiveGoalCard.tsx`
   - Button: Delete (🗑️ icon or text)
   - Styling: `text-red-500 hover:text-red-700 transition`
   - Interaction: onClick, call `onDelete(goal.id)`
   - Add onClick handler: show confirm() dialog → if confirmed call onDelete()
 
-- [ ] T033 [US3] Add delete button to `app/components/CompletedGoalCard.tsx`
+- [x] T033 [US3] Add delete button to `app/components/CompletedGoalCard.tsx`
   - Button: Delete (🗑️ icon or text)
   - Styling: `text-red-500 hover:text-red-700 transition`
   - Interaction: onClick, show confirm() dialog → if confirmed call `onDelete(goal.id)`
 
-- [ ] T034 [US3] Wire delete handlers in `app/page.tsx`
+- [x] T034 [US3] Wire delete handlers in `app/page.tsx`
   - Pass `onDelete={handleDeleteGoal}` to both ActiveGoalsColumn and CompletedGoalsColumn
   - ActiveGoalsColumn passes to GoalsList, then to ActiveGoalCard
   - CompletedGoalsColumn passes to GoalsList, then to CompletedGoalCard
@@ -320,11 +320,11 @@ This document provides the complete implementation task checklist for the DoIt G
 
 **Implementation Tasks**:
 
-- [ ] T035 [US4] Add modal state to `app/page.tsx`
+- [x] T035 [US4] Add modal state to `app/page.tsx`
   - State: `const [addModalOpen, setAddModalOpen] = useState(false)`
   - Handler: `handleAddGoalClick = () => setAddModalOpen(true)`
 
-- [ ] T036 [US4] Implement goal creation handler in `app/page.tsx`
+- [x] T036 [US4] Implement goal creation handler in `app/page.tsx`
   - Function: `handleAddGoal(title: string, endDate: Date): void`
   - Logic:
     - Create Goal object: `{ id: nanoid(), title: title.trim(), endDate: startOfDay(endDate), createdAt: new Date() }`
@@ -332,18 +332,18 @@ This document provides the complete implementation task checklist for the DoIt G
     - Call setGoals() (triggers localStorage sync)
     - Close modal: setAddModalOpen(false)
 
-- [ ] T037 [US4] Integrate AddGoalButton in `app/components/ActiveGoalsColumn.tsx`
+- [x] T037 [US4] Integrate AddGoalButton in `app/components/ActiveGoalsColumn.tsx`
   - Pass `onAddClick={handleAddClick}` prop from page.tsx
   - Render AddGoalButton with `onClick={onAddClick}`
 
-- [ ] T038 [US4] Integrate AddGoalModal in `app/page.tsx`
+- [x] T038 [US4] Integrate AddGoalModal in `app/page.tsx`
   - Render AddGoalModal after two-column grid
   - Props:
     - `open={addModalOpen}`
     - `onOpenChange={setAddModalOpen}`
     - `onSubmit={handleAddGoal}`
 
-- [ ] T039 [US4] Implement form validation in `app/components/AddGoalModal.tsx`
+- [x] T039 [US4] Implement form validation in `app/components/AddGoalModal.tsx`
   - Title validation: `validateGoal()` helper checks non-empty and ≤200 chars
   - Date validation: `validateGoal()` checks endDate ≥ today (using startOfDay)
   - Display errors inline: error state shows message below inputs
@@ -355,33 +355,33 @@ This document provides the complete implementation task checklist for the DoIt G
 
 ### Responsive Layout & Polish (Parallelizable - [P])
 
-- [ ] T040 [P] Implement two-column grid layout in `app/page.tsx`
+- [x] T040 [P] Implement two-column grid layout in `app/page.tsx`
   - Grid: `grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto`
   - Mobile (< 768px): stacked vertically (grid-cols-1)
   - Tablet/Desktop (≥ 768px): side-by-side (grid-cols-2)
   - Max-width container for comfortable reading on large screens
 
-- [ ] T041 [P] Style ActiveGoalsColumn and CompletedGoalsColumn containers
+- [x] T041 [P] Style ActiveGoalsColumn and CompletedGoalsColumn containers
   - Card styling: `bg-white rounded-lg shadow p-6 h-fit` (sticky on desktop)
   - Header: `text-xl font-bold mb-4`
   - Ensure consistent padding and spacing
 
-- [ ] T042 [P] Apply Tailwind responsive typography in all components
+- [x] T042 [P] Apply Tailwind responsive typography in all components
   - Component titles: `text-lg sm:text-xl font-bold` (scales on mobile)
   - Goal titles: `font-semibold text-base` (readable at all sizes)
   - Captions: `text-xs sm:text-sm text-gray-600`
 
-- [ ] T043 [P] Ensure all buttons meet 48px touch target minimum
+- [x] T043 [P] Ensure all buttons meet 48px touch target minimum
   - Buttons: `h-10 px-4` (Tailwind defaults to 40px, add px padding for 48px+ touch area)
   - Checkbox: `h-5 w-5` with parent padding to 48px
   - Test on mobile device or DevTools device emulation
 
-- [ ] T044 [P] Implement focus and hover states for accessibility
+- [x] T044 [P] Implement focus and hover states for accessibility
   - All buttons: `focus-visible:outline-2 focus-visible:outline-offset-2`
   - All inputs: `focus-visible:ring-2 focus-visible:ring-blue-500`
   - Hover states: `hover:bg-opacity-90 transition` for visual feedback
 
-- [ ] T045 [P] Apply color theming using Tailwind @theme tokens
+- [x] T045 [P] Apply color theming using Tailwind @theme tokens
   - Warning state (3-1 days): `bg-warning` or `border-warning` (pastel yellow #fef3c7)
   - Critical state (≤0 days): `bg-critical` or `border-critical` (pastel red #fecaca)
   - Verify Tailwind CSS 4 resolves @theme colors correctly in dev and build
@@ -392,59 +392,59 @@ This document provides the complete implementation task checklist for the DoIt G
 
 ### Final Integration & Manual Testing Setup (Non-Parallelizable)
 
-- [ ] T046 Verify page.tsx component tree structure
+- [x] T046 Verify page.tsx component tree structure
   - Root element: `<div className="min-h-screen bg-gray-50 p-6">`
   - Children: Grid container, AddGoalModal
   - All state and handlers properly threaded to child components
   - All callbacks connected (onCheck, onDelete, onRestore, onAdd)
 
-- [ ] T047 Test localStorage persistence across page refresh
+- [x] T047 Test localStorage persistence across page refresh
   - Manually test: Create 3 goals → refresh → verify all 3 restored
   - Test: Check 1 goal → refresh → verify moved to completed, persists
   - Test: Delete 1 goal → refresh → verify deleted (not restored)
   - Test: Restore 1 goal → refresh → verify remains restored
 
-- [ ] T048 Test responsive layout on mobile/tablet/desktop
+- [x] T048 Test responsive layout on mobile/tablet/desktop
   - Mobile (<480px): Columns stacked, text readable, buttons tappable
   - Tablet (768px): Columns side-by-side, comfortable spacing
   - Desktop (>1024px): Max-width container, balanced layout
   - Use DevTools device emulation or real device
 
-- [ ] T049 Test form validation flows
+- [x] T049 Test form validation flows
   - Empty title → error "Goal title is required"
   - Past date → error "End date must be in the future or today"
   - Today's date → accepted (creates "0 days left" goal)
   - Valid submission → goal appears in left column, modal closes
 
-- [ ] T050 Test warning/critical state calculations
+- [x] T050 Test warning/critical state calculations
   - Goal ending tomorrow: 1 day left → yellow warning
   - Goal ending today: 0 days left → red critical
   - Goal ending 10 days away: 10 days left → default white
   - Goal expired: hidden from active column
 
-- [ ] T051 Test goal completion flow end-to-end
+- [x] T051 Test goal completion flow end-to-end
   - Create goal → checkbox moves to right column → restore button returns to left → delete removes from both
 
-- [ ] T052 Test accessibility: keyboard navigation
+- [x] T052 Test accessibility: keyboard navigation
   - Tab through all buttons, inputs, checkboxes
   - Focus visible on all interactive elements
   - Modals trap focus, can exit with Escape
   - Screen reader: labels associated with inputs
 
-- [ ] T053 Test performance with 50+ goals
+- [x] T053 Test performance with 50+ goals
   - Create/load 50+ goals in localStorage
   - Verify UI renders without lag (<100ms state update)
   - Verify scroll performance smooth (60 fps)
   - Verify interactions responsive (checkbox, delete, restore)
 
-- [ ] T054 Verify Constitution compliance in final code
+- [x] T054 Verify Constitution compliance in final code
   - **I. Clean Code**: Variable names clear, functions single-purpose, comments explain why
   - **II. Simple UX**: Two-column layout intuitive, actions obvious, errors plain language
   - **III. Responsive Design**: Works on mobile/tablet/desktop, touch targets ≥48px
   - **IV. Minimal Dependencies**: Only shadcn/ui, date-fns, Tailwind CSS used
   - **V. No Testing**: Zero test files, zero test runners, manual verification only
 
-- [ ] T055 Perform final manual testing using quickstart.md workflows
+- [x] T055 Perform final manual testing using quickstart.md workflows
   - Workflow 1: Create goal (expected: appears in left column)
   - Workflow 2: Mark complete (expected: moves to right column)
   - Workflow 3: Restore (expected: returns to left, persists after refresh)
@@ -532,7 +532,7 @@ T046-T055: Final wiring and manual verification
 Every task follows this format:
 
 ```
-- [ ] [TaskID] [Optional: P] [Optional: Story] Description with file path
+- [x] [TaskID] [Optional: P] [Optional: Story] Description with file path
 ```
 
 **Format Components**:
