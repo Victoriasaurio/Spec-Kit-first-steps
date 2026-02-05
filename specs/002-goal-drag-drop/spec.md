@@ -34,6 +34,7 @@ A user with multiple active goals wants to set their priority order visually. Th
 2. **Given** user has reordered goals, **When** user refreshes the page, **Then** the new goal order is preserved
 3. **Given** user is dragging a goal, **When** user hovers over another goal's position, **Then** a visual indicator shows where the goal will be placed if dropped
 4. **Given** user starts dragging a goal, **When** user moves mouse outside goal area, **Then** the drag operation can be canceled and original order is maintained
+5. **Given** keyboard user focuses on Goal C using Tab, **When** user presses Shift+Up arrow twice, **Then** Goal C moves above Goal A and new order is [Goal C, Goal A, Goal B], and pressing Enter confirms the repositioning
 
 ---
 
@@ -82,28 +83,31 @@ A user accidentally drops a goal in the wrong position. They want a simple way t
 
 ### Edge Cases
 
-- What happens when a user drags a goal while the list is being updated by another browser tab/window?
-- How does the system handle dragging when goals are being added or removed in real-time?
-- What is the behavior when a user drags a goal and loses internet connection mid-drag?
+- What happens when a user drags a goal while the list is being updated by another browser tab/window? → System applies reorder from the other tab and displays a toast notification to the user about the override
+- How does the system handle dragging when goals are being added or removed in real-time? → System prevents drag operations on goals being deleted; drag completion is rejected if target goal was deleted mid-drag
+- What is the behavior when a user drags a goal and loses internet connection mid-drag? → Drag is allowed to complete locally; reorder is saved to local storage and synced when connection restored
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow users to drag and drop goal cards within the active goals list to reorder them
-- **FR-002**: System MUST allow users to drag and drop goal cards within the completed goals list to reorder them independently from active goals
-- **FR-003**: System MUST persist the new goal order immediately upon drop (not requiring explicit save action)
-- **FR-004**: System MUST preserve goal order across page refreshes and browser sessions
+- **FR-001**: System MUST allow users to drag and drop goal cards within their own personal active goals list to reorder them
+- **FR-002**: System MUST allow users to drag and drop goal cards within their own personal completed goals list to reorder them independently from active goals
+- **FR-003**: System MUST persist the new goal order immediately upon drop (not requiring explicit save action), both online and offline
+- **FR-004**: System MUST preserve goal order across page refreshes and browser sessions, with automatic synchronization to backend when internet connection is restored
 - **FR-005**: System MUST display visual feedback during drag operations (raised/highlighted state for dragged goal, insertion indicators for drop positions)
 - **FR-006**: System MUST allow users to cancel a drag operation by moving the mouse outside the goal list or pressing Escape, restoring the original order
 - **FR-007**: System MUST prevent users from dragging goals between active and completed lists
 - **FR-008**: System MUST handle drag operations on touch devices (mobile/tablet) with appropriate touch gestures
-- **FR-009**: System MUST maintain accessibility for drag-and-drop operations for users with keyboard navigation
+- **FR-009**: System MUST maintain full keyboard accessibility for drag-and-drop operations: Tab to focus a goal, Arrow keys to navigate between goals, Shift+Up/Down arrows to move goal up/down in the list, Enter to confirm repositioning
+- **FR-010**: System MUST sync offline reorder changes to backend automatically when internet connection is restored, applying last-write-wins conflict resolution if conflicts occur
+- **FR-011**: System MUST display a non-intrusive toast notification when goal order from another browser tab/window overrides the current tab's order (concurrent session conflict notification)
 
 ### Key Entities *(include if feature involves data)*
 
 - **Goal**: Represents a user's goal with properties including id, title, description, status (active/completed), and order (sequence position within its list)
-  - **order** attribute: Integer representing the sequential position within the active or completed goals list
+  - **order** attribute: Integer representing the sequential position within the active or completed goals list (0-indexed or 1-indexed, sequentially numbered without gaps)
+  - On reorder: All goals affected by the reorder operation have their order values renumbered sequentially to maintain clean state and prevent gaps
   - Must support updating this attribute when reordering occurs
 - **GoalList**: Container for either active or completed goals with ordering maintained independently
 
@@ -118,6 +122,16 @@ A user accidentally drops a goal in the wrong position. They want a simple way t
 - **SC-005**: Zero accessible keyboard users are blocked from reordering goals; full keyboard alternative navigation exists
 - **SC-006**: Reorder operation completes and persists within 1 second or less, providing instant feedback to user
 
+## Clarifications
+
+### Session 2026-02-05
+
+- Q: When reordering goals (e.g., moving Goal C before Goal A in [A, B, C]), how should the system manage the `order` field? → A: Renumber all affected goals sequentially after each reorder (cleaner state, no gaps, easier queries)
+- Q: What specific keyboard shortcuts enable drag-and-drop reordering for keyboard-only users? → A: Arrow keys navigate between goals + Shift/Ctrl + arrow keys to move goal + Enter to confirm repositioning
+- Q: When a user reorders goals while offline, should the changes still persist locally? → A: Allow offline reordering with local persistence; auto-sync when online
+- Q: Can users reorder shared/collaborative goals, or only their own personal goals? → A: Users can only reorder their own goals; no multi-user/shared goal support in MVP
+- Q: How should the system communicate when another browser tab's reorder overrides the current tab (last-write-wins)? → A: Show a subtle toast/notification when reorder from another session overrides current tab
+
 ## Assumptions
 
 - The existing goal storage system (localStorage or backend) supports storing and retrieving goal order
@@ -126,3 +140,6 @@ A user accidentally drops a goal in the wrong position. They want a simple way t
 - The feature is optional/nice-to-have; users can still manage goals if drag-and-drop is unavailable
 - Undo functionality (P3) is not required for MVP and can be added later if needed
 - Concurrent edits from multiple tabs/windows will use last-write-wins strategy (later reorder overrides earlier)
+- Offline reordering is supported with local storage; changes sync automatically when connection is restored
+- System uses last-write-wins conflict resolution for concurrent offline edits from multiple tabs/windows
+- Drag-and-drop reordering applies only to the current user's personal goals; no shared/collaborative goal support in MVP scope
