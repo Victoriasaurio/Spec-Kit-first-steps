@@ -1,5 +1,116 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { nanoid } from "nanoid";
+import type { Goal } from "@/app/lib/types";
+import { loadActiveGoals, saveActiveGoals, loadCompletedGoals, saveCompletedGoals } from "@/app/lib/goalStorage";
+import { ActiveGoalsColumn } from "@/app/components/ActiveGoalsColumn";
+import { CompletedGoalsColumn } from "@/app/components/CompletedGoalsColumn";
+import { AddGoalModal } from "@/app/components/AddGoalModal";
+
 export default function Home() {
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [completedGoals, setCompletedGoals] = useState<Goal[]>([]);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load goals from localStorage on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const activeGoals = loadActiveGoals();
+    const completed = loadCompletedGoals();
+    setGoals(activeGoals);
+    setCompletedGoals(completed);
+    setIsLoading(false);
+  }, []);
+
+  // Sync active goals to localStorage
+  useEffect(() => {
+    if (!isLoading) {
+      saveActiveGoals(goals);
+    }
+  }, [goals, isLoading]);
+
+  // Sync completed goals to localStorage
+  useEffect(() => {
+    if (!isLoading) {
+      saveCompletedGoals(completedGoals);
+    }
+  }, [completedGoals, isLoading]);
+
+  // Handle goal completion (move to completed)
+  const handleCheckGoal = (id: string) => {
+    const goal = goals.find((g) => g.id === id);
+    if (!goal) return;
+
+    setGoals((prev) => prev.filter((g) => g.id !== id));
+    setCompletedGoals((prev) => [
+      ...prev,
+      { ...goal, completedAt: new Date() },
+    ]);
+  };
+
+  // Handle goal restoration (move back to active)
+  const handleRestoreGoal = (id: string) => {
+    const goal = completedGoals.find((g) => g.id === id);
+    if (!goal) return;
+
+    setCompletedGoals((prev) => prev.filter((g) => g.id !== id));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { completedAt, ...goalWithoutCompleted } = goal;
+    setGoals((prev) => [...prev, goalWithoutCompleted]);
+  };
+
+  // Handle goal deletion
+  const handleDeleteGoal = (id: string, isCompleted: boolean) => {
+    if (isCompleted) {
+      setCompletedGoals((prev) => prev.filter((g) => g.id !== id));
+    } else {
+      setGoals((prev) => prev.filter((g) => g.id !== id));
+    }
+  };
+
+  // Handle add goal button click
+  const handleAddGoalClick = () => {
+    setAddModalOpen(true);
+  };
+
+  // Handle new goal creation
+  const handleAddGoal = (title: string, endDate: Date) => {
+    const newGoal: Goal = {
+      id: nanoid(),
+      title: title.trim(),
+      endDate,
+      createdAt: new Date(),
+    };
+
+    setGoals((prev) => [...prev, newGoal]);
+  };
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
-    <></>
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
+        <ActiveGoalsColumn
+          goals={goals}
+          onCheck={handleCheckGoal}
+          onDelete={(id) => handleDeleteGoal(id, false)}
+          onAddClick={handleAddGoalClick}
+        />
+        <CompletedGoalsColumn
+          goals={completedGoals}
+          onRestore={handleRestoreGoal}
+          onDelete={(id) => handleDeleteGoal(id, true)}
+        />
+      </div>
+      <AddGoalModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        onSubmit={handleAddGoal}
+      />
+    </div>
   );
 }
