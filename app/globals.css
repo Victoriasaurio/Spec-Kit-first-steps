@@ -123,3 +123,17 @@
     @apply bg-background text-foreground;
   }
 }
+/* Sortable.js drag-and-drop visual feedback states */
+@layer components {
+  .sortable-drag {
+    @apply scale-105 shadow-xl opacity-75 cursor-grabbing transition-transform;
+  }
+
+  .sortable-ghost {
+    @apply opacity-50 bg-slate-100;
+  }
+
+  .insertion-line {
+    @apply border-t-2 border-blue-500 opacity-70;
+  }
+}

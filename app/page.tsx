@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 import type { Goal } from "@/app/lib/types";
-import { loadActiveGoals, saveActiveGoals, loadCompletedGoals, saveCompletedGoals } from "@/app/lib/goalStorage";
+import { 
+  loadActiveGoals, 
+  saveActiveGoals, 
+  loadCompletedGoals, 
+  saveCompletedGoals,
+  reorderGoals,
+  initializeGoalStorage,
+} from "@/app/lib/goalStorage";
 import { ActiveGoalsColumn } from "@/app/components/ActiveGoalsColumn";
 import { CompletedGoalsColumn } from "@/app/components/CompletedGoalsColumn";
 import { AddGoalModal } from "@/app/components/AddGoalModal";
@@ -13,14 +20,40 @@ export default function Home() {
   const [completedGoals, setCompletedGoals] = useState<Goal[]>([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  // Load goals from localStorage on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Load goals from localStorage and initialize storage on mount
   useEffect(() => {
     const activeGoals = loadActiveGoals();
     const completed = loadCompletedGoals();
-    setGoals(activeGoals);
-    setCompletedGoals(completed);
+    
+    // Ensure all goals have order field (migration)
+    const activeWithOrder = activeGoals.map((g, i) => ({
+      ...g,
+      order: g.order !== undefined ? g.order : i,
+    }));
+    const completedWithOrder = completed.map((g, i) => ({
+      ...g,
+      order: g.order !== undefined ? g.order : i,
+    }));
+    
+    setGoals(activeWithOrder);
+    setCompletedGoals(completedWithOrder);
+
+    // T011: Initialize storage layer with cross-tab sync callback
+    initializeGoalStorage((event: any) => {
+      // On cross-tab sync, reload goals from localStorage
+      const updated = loadActiveGoals();
+      const updatedCompleted = loadCompletedGoals();
+      setGoals(updated);
+      setCompletedGoals(updatedCompleted);
+
+      // Show sync notification
+      if (event.listType) {
+        console.log(`Goals updated in another tab (${event.listType})`);
+      }
+    });
+
     setIsLoading(false);
   }, []);
 
@@ -70,6 +103,46 @@ export default function Home() {
     }
   };
 
+  // T017: Handle reordering of active goals
+  const handleReorderActive = (goalIds: string[]) => {
+    setIsSyncing(true);
+    try {
+      reorderGoals(goalIds, 'active');
+      
+      // Update local state to reflect new order
+      const reordered = goalIds
+        .map(id => goals.find(g => g.id === id))
+        .filter((g): g is Goal => g !== undefined)
+        .map((goal, index) => ({ ...goal, order: index }));
+      
+      setGoals(reordered);
+    } catch (error) {
+      console.error('Failed to reorder active goals:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // T032: Handle reordering of completed goals
+  const handleReorderCompleted = (goalIds: string[]) => {
+    setIsSyncing(true);
+    try {
+      reorderGoals(goalIds, 'completed');
+      
+      // Update local state to reflect new order
+      const reordered = goalIds
+        .map(id => completedGoals.find(g => g.id === id))
+        .filter((g): g is Goal => g !== undefined)
+        .map((goal, index) => ({ ...goal, order: index }));
+      
+      setCompletedGoals(reordered);
+    } catch (error) {
+      console.error('Failed to reorder completed goals:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   // Handle add goal button click
   const handleAddGoalClick = () => {
     setAddModalOpen(true);
@@ -82,6 +155,7 @@ export default function Home() {
       title: title.trim(),
       endDate,
       createdAt: new Date(),
+      order: goals.length, // Add to end with proper order
     };
 
     setGoals((prev) => [...prev, newGoal]);
@@ -99,11 +173,15 @@ export default function Home() {
           onCheck={handleCheckGoal}
           onDelete={(id) => handleDeleteGoal(id, false)}
           onAddClick={handleAddGoalClick}
+          onReorder={handleReorderActive}
+          isSyncing={isSyncing}
         />
         <CompletedGoalsColumn
           goals={completedGoals}
           onRestore={handleRestoreGoal}
           onDelete={(id) => handleDeleteGoal(id, true)}
+          onReorder={handleReorderCompleted}
+          isSyncing={isSyncing}
         />
       </div>
       <AddGoalModal
@@ -114,3 +192,4 @@ export default function Home() {
     </div>
   );
 }
+

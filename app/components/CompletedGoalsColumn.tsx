@@ -5,18 +5,23 @@
 import type { Goal } from "@/app/lib/types";
 import { sortCompletedGoals } from "@/app/lib/goalUtils";
 import { EmptyState } from "./EmptyState";
-import { GoalsList } from "./GoalsList";
+import { DraggableGoalsList } from "./DraggableGoalsList";
+import { CompletedGoalCard } from "./CompletedGoalCard";
 
 interface CompletedGoalsColumnProps {
   goals: Goal[];
   onRestore: (id: string) => void;
   onDelete: (id: string) => void;
+  onReorder: (goalIds: string[]) => void;
+  isSyncing?: boolean;
 }
 
 export function CompletedGoalsColumn({
   goals,
   onRestore,
   onDelete,
+  onReorder,
+  isSyncing = false,
 }: CompletedGoalsColumnProps) {
   const sortedGoals = sortCompletedGoals(goals);
 
@@ -26,11 +31,19 @@ export function CompletedGoalsColumn({
       {sortedGoals.length === 0 ? (
         <EmptyState type="completed" />
       ) : (
-        <GoalsList
+        <DraggableGoalsList
           goals={sortedGoals}
-          isCompleted={true}
-          onRestore={onRestore}
-          onDelete={onDelete}
+          onReorder={onReorder}
+          listType="completed"
+          className="max-h-[600px] overflow-y-auto"
+          isSyncing={isSyncing}
+          renderGoal={(goal) => (
+            <CompletedGoalCard
+              goal={goal as Goal & { completedAt: Date }}
+              onRestore={onRestore}
+              onDelete={onDelete}
+            />
+          )}
         />
       )}
     </div>

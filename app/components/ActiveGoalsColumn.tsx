@@ -6,13 +6,16 @@ import type { Goal } from "@/app/lib/types";
 import { sortActiveGoals, daysRemaining } from "@/app/lib/goalUtils";
 import { AddGoalButton } from "./AddGoalButton";
 import { EmptyState } from "./EmptyState";
-import { GoalsList } from "./GoalsList";
+import { DraggableGoalsList } from "./DraggableGoalsList";
+import { ActiveGoalCard } from "./ActiveGoalCard";
 
 interface ActiveGoalsColumnProps {
   goals: Goal[];
   onCheck: (id: string) => void;
   onDelete: (id: string) => void;
   onAddClick: () => void;
+  onReorder: (goalIds: string[]) => void;
+  isSyncing?: boolean;
 }
 
 export function ActiveGoalsColumn({
@@ -20,6 +23,8 @@ export function ActiveGoalsColumn({
   onCheck,
   onDelete,
   onAddClick,
+  onReorder,
+  isSyncing = false,
 }: ActiveGoalsColumnProps) {
   // Filter out expired goals (keep only those with 0 or more days remaining)
   const activeGoals = goals.filter((goal) => daysRemaining(goal.endDate) >= 0);
@@ -34,12 +39,22 @@ export function ActiveGoalsColumn({
       {sortedGoals.length === 0 ? (
         <EmptyState type="active" />
       ) : (
-        <GoalsList
+        <DraggableGoalsList
           goals={sortedGoals}
-          onCheck={onCheck}
-          onDelete={onDelete}
+          onReorder={onReorder}
+          listType="active"
+          className="max-h-[600px] overflow-y-auto"
+          isSyncing={isSyncing}
+          renderGoal={(goal) => (
+            <ActiveGoalCard
+              goal={goal}
+              onCheck={onCheck}
+              onDelete={onDelete}
+            />
+          )}
         />
       )}
     </div>
   );
 }
+
