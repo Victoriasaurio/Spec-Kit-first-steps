@@ -5,3 +5,8 @@ const oldAge = (age: number) => {
         return false;
     }
 }
+
+let x = true;
+if (x === true) {
+  console.log("ok");
+}
